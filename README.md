@@ -1,3 +1,3 @@
-When in doubt, no homo.
+When in doubt `:NoHomo`
 =======================
 Highlights and replaces homoglyphs with the proper character.
