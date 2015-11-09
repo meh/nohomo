@@ -65,7 +65,7 @@ let s:glyphs = {
 	\ 'Y':  '\u03A5\u2CA8\u03D2\u24CE\uFF39',
 	\ 'Z':  '\u0396\u13C3\u2124\u24CF\uFF3A',
 	\ '[':  '\uFF3B',
-	\ '\\': '\uFF3C\u2216\u29F5\u29F9\uFE68\u3035',
+	\ '\': '\uFF3C\u2216\u29F5\u29F9\uFE68\u3035',
 	\ ']':  '\uFF3D',
 	\ '^':  '\uFF3E\u02C4\u02C6\u1DBA\u2303\u0302',
 	\ '_':  '\uFF3F\u02CD\u268A\u0331\u0320\uFE58',
@@ -104,7 +104,11 @@ let s:glyphs = {
 
 function! s:NoHomo() range
 	for item in items(s:glyphs)
-		silent! exe a:firstline . ',' . a:lastline . 's/[' . item[1] . ']/\' . item[0] . '/ge'
+		if item[0] == '/' || item[0] == '\'
+			silent! exe a:firstline . ',' . a:lastline . 's/[' . item[1] . ']/\' . item[0] . '/ge'
+		else
+			silent! exe a:firstline . ',' . a:lastline . 's/[' . item[1] . ']/' . item[0] . '/ge'
+		endif
 	endfor
 endfunction
 
