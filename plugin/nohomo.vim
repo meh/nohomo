@@ -2,7 +2,7 @@ if exists("g:loaded_nohomo")
 	finish
 endif
 
-let g:loaded_spelchek = 1
+let g:loaded_nohomo = 1
 
 let s:glyphs = {
 	\ ' ':  '\u00A0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000',
