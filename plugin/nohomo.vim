@@ -2,7 +2,9 @@ if exists("g:loaded_nohomo")
 	finish
 endif
 
-let g:loaded_nohomo = 1
+let g:loaded_nohomo          = 1
+let g:nohomo_inside          = 1
+let g:nohomo_ignore_encoding = 0
 
 let s:glyphs = {
 	\ ' ': '\u00A0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000',
@@ -65,7 +67,7 @@ let s:glyphs = {
 	\ 'Y': '\u03A5\u2CA8\u03D2\u24CE\uFF39',
 	\ 'Z': '\u0396\u13C3\u2124\u24CF\uFF3A',
 	\ '[': '\uFF3B',
-	\ '\\': '\uFF3C\u2216\u29F5\u29F9\uFE68\u3035',
+	\ '\': '\uFF3C\u2216\u29F5\u29F9\uFE68\u3035',
 	\ ']': '\uFF3D',
 	\ '^': '\uFF3E\u02C4\u02C6\u1DBA\u2303\u0302',
 	\ '_': '\uFF3F\u02CD\u268A\u0331\u0320\uFE58',
@@ -103,6 +105,10 @@ let s:glyphs = {
 	\ }
 
 function! s:NoHomo() range
+	if &enc != "utf-8" && !g:nohomo_ignore_encoding
+		finish
+	endif
+
 	for item in items(s:glyphs)
 		if item[0] == '/' || item[0] == '\'
 			silent! exe a:firstline . ',' . a:lastline . 's/[' . item[1] . ']/\' . item[0] . '/ge'
@@ -113,20 +119,48 @@ function! s:NoHomo() range
 endfunction
 
 function! s:Syntax()
+	if &enc != "utf-8" && !g:nohomo_ignore_encoding
+		finish
+	endif
+
 	let codepoints = ""
 
 	for value in values(s:glyphs)
-		let codepoints = codepoints . value
+		let codepoints .= value
 	endfor
 
 	silent! exe "syntax match NoHomo '[" . codepoints . "]'"
+
+	if g:nohomo_inside
+		let contained = "hue"
+		let string    = ""
+
+		redir => string
+		silent! syntax
+		redir END
+
+		let offset = 0
+
+		while offset != -1
+			let name = matchstr(string, '^\w\w*', offset)
+
+			if name != "" && name != "NoHomo"
+				let contained .= ',' . name
+			endif
+
+			let offset = matchend(string, '\n', offset)
+		endwhile
+
+		silent! exe "syntax match NoHomoInside '[" . codepoints . "]' containedin=" . contained
+	endif
 endfunction
 
 command! -range=% NoHomo <line1>,<line2>call s:NoHomo()
 
 highlight link NoHomo Error
+highlight link NoHomoInside Error
 
 augroup nohomo
 	autocmd!
-	autocmd BufReadPost * call s:Syntax()
+	autocmd Syntax * call s:Syntax()
 augroup END
