@@ -5,6 +5,7 @@ endif
 let g:loaded_nohomo          = 1
 let g:nohomo_inside          = 1
 let g:nohomo_ignore_encoding = 0
+let g:nohomo_ignore_filetype = ['mail', 'markdown']
 
 let s:glyphs = {
 	\ ' ': '\u00A0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000',
@@ -106,7 +107,7 @@ let s:glyphs = {
 
 function! s:NoHomo() range
 	if &enc != "utf-8" && !g:nohomo_ignore_encoding
-		finish
+		return
 	endif
 
 	for item in items(s:glyphs)
@@ -120,8 +121,12 @@ endfunction
 
 function! s:Syntax()
 	if &enc != "utf-8" && !g:nohomo_ignore_encoding
-		finish
+		return
 	endif
+
+	if index(g:nohomo_ignore_filetype, &ft) >= 0
+		return
+	end
 
 	let codepoints = ""
 
@@ -129,10 +134,10 @@ function! s:Syntax()
 		let codepoints .= value
 	endfor
 
-	silent! exe "syntax match NoHomo '[" . codepoints . "]'"
+	exe "syntax match NoHomo '[" . codepoints . "]'"
 
 	if g:nohomo_inside
-		let contained = "hue"
+		let contained = ""
 		let string    = ""
 
 		redir => string
@@ -142,7 +147,7 @@ function! s:Syntax()
 		let offset = 0
 
 		while offset != -1
-			let name = matchstr(string, '^\w\w*', offset)
+			let name = matchstr(string, '^\w\+', offset)
 
 			if name != "" && name != "NoHomo"
 				let contained .= ',' . name
@@ -151,7 +156,7 @@ function! s:Syntax()
 			let offset = matchend(string, '\n', offset)
 		endwhile
 
-		silent! exe "syntax match NoHomoInside '[" . codepoints . "]' containedin=" . contained
+		exe "syntax match NoHomoInside '[" . codepoints . "]' containedin=" . contained
 	endif
 endfunction
 
@@ -161,6 +166,5 @@ highlight link NoHomo Error
 highlight link NoHomoInside Error
 
 augroup nohomo
-	autocmd!
 	autocmd Syntax * call s:Syntax()
 augroup END

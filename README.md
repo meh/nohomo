@@ -13,6 +13,9 @@ Settings
 * `let g:nohomo_ignore_encoding = 0` makes it work even when the encoding isn't
   utf-8, shit might break.
 
+* `let g:nohomo_ignore_filetype = ['mail', 'markdown']` list of filetypes to
+  not highlight.
+
 Commands
 --------
 
