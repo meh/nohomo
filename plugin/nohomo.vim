@@ -156,7 +156,9 @@ function! s:Syntax()
 			let offset = matchend(string, '\n', offset)
 		endwhile
 
-		exe "syntax match NoHomoInside '[" . codepoints . "]' containedin=" . contained
+		if contained != ""
+			exe "syntax match NoHomoInside '[" . codepoints . "]' containedin=" . contained
+		endif
 	endif
 endfunction
 
