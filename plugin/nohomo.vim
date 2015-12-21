@@ -2,10 +2,19 @@ if exists("g:loaded_nohomo")
 	finish
 endif
 
-let g:loaded_nohomo          = 1
-let g:nohomo_inside          = 1
-let g:nohomo_ignore_encoding = 0
-let g:nohomo_ignore_filetype = ['mail', 'markdown']
+let g:loaded_nohomo = 1
+
+if !exists("g:nohomo_inside")
+	let g:nohomo_inside = 1
+endif
+
+if !exists("g:nohomo_ignore_encoding")
+	let g:nohomo_ignore_encoding = 0
+endif
+
+if !exists("g:nohomo_ignore_filetype")
+	let g:nohomo_ignore_filetype = ['mail', 'markdown']
+endif
 
 let s:glyphs = {
 	\ ' ': '\u00A0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000',
